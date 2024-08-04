@@ -11,6 +11,7 @@ $stdout.sync = true
 user, pass = Netrc.read["system.gotsport.com"]
 
 dbfile = ""
+ply = nil
 OptionParser.new do |opts|
   opts.banner = "Usage: gs_get_fan_1_worklist.rb [options]"
 
@@ -18,6 +19,10 @@ OptionParser.new do |opts|
     dbfile = u
   end
   
+  opts.on("-p=s", "--ply=s", "Which parallel thread") do |p|
+    ply = p
+  end
+
 end.parse!
 
 
@@ -32,8 +37,8 @@ class Driver
         @options = Selenium::WebDriver::Firefox::Options.new
         @d = Selenium::WebDriver.for :remote, url: 'http://localhost:' + port.to_s, options: @options
 
-        @wait = Selenium::WebDriver::Wait.new(:timeout => 5)
-        @d.manage.timeouts.implicit_wait = 5
+        @wait = Selenium::WebDriver::Wait.new(:timeout => 2)
+        @d.manage.timeouts.implicit_wait = 2
         @d.manage.delete_all_cookies
         @d.manage.window.resize_to(1920,1080)
         @d.get(site)
@@ -67,7 +72,13 @@ puts "Starting.. User is #{user}"
 begin
   
 
-
+      if ply
+        table = "raw_gs_fan_etc" + ply
+        puts "Parallel processing for ply #{ply}"
+      else
+        table = "raw_gs_fan_etc"
+        puts "Not processing in parallel"
+      end
       
       dl = Driver.new('https://system.gotsport.com')
   
@@ -88,7 +99,7 @@ begin
 
 
 
-  rows = db.query("select profile_url from raw_gs_fan_etc where last_name is null;")
+  rows = db.query("select profile_url from #{table} where last_name is null;")
   
 
   rows.each do |row| 
@@ -116,6 +127,30 @@ begin
         fanlocked = nil
       end
 
+      begin
+        p = dl.webdriver.find_element(css: '#js-user-photo-field')
+      rescue Selenium::WebDriver::Error::NoSuchElementError
+        p = nil
+      end
+
+      if p
+        photolocked = "N"
+      else
+        photolocked = "Y"
+      end
+
+      begin
+        d = dl.webdriver.find_element(css: 'a.text-danger:nth-child(5)')
+      rescue Selenium::WebDriver::Error::NoSuchElementError
+        d = nil
+      end
+
+      if d
+        photopresent = "Y"
+      else
+        photopresent = "N"
+      end
+
       itc_birth = Selenium::WebDriver::Support::Select.new(dl.find('#user_itc_country_of_birth')).selected_options[0].text
       itc_citz = Selenium::WebDriver::Support::Select.new(dl.find('#user_itc_country_of_citizenship_')).selected_options[0].text
       birthyear = Selenium::WebDriver::Support::Select.new(dl.find('#user_birthdate_1i')).selected_options[0].text
@@ -126,12 +161,12 @@ begin
       birthdate = birthyear + "-" + ("0" + birthmonth)[-2..-1] + "-" + ("0" + birthday)[-2..-1]
 
       puts "#{firstname} #{lastname} - Locked? #{readonly} - " + 
-            "#{birthyear}-#{birthmonth}-#{birthday} #{birthdate} #{itc_birth} #{itc_citz} FAN:#{fan} #{fanlocked}"
+            "#{birthyear}-#{birthmonth}-#{birthday} #{birthdate} #{itc_birth} #{itc_citz} FAN:#{fan} locked:#{fanlocked} photolocked:#{photolocked} photopresent:#{photopresent}"
 
 
-      db.execute("update raw_gs_fan_etc set first_name = ?, last_name = ?, birthdate = ?, country_birth = ?," +
-            "country_citizen = ?, fan = ?, fanlocked = ?, namelocked = ? where profile_url = ?",
-             firstname,lastname,birthdate,itc_birth,itc_citz,fan,fanlocked,readonly,thisurl)
+      db.execute("update #{table} set first_name = ?, last_name = ?, birthdate = ?, country_birth = ?," +
+            "country_citizen = ?, fan = ?, fanlocked = ?, namelocked = ?, photolocked = ? , photopresent = ? where profile_url = ?",
+             firstname,lastname,birthdate,itc_birth,itc_citz,fan,fanlocked,readonly,thisurl,photolocked,photopresent)
   end 
 
 ensure

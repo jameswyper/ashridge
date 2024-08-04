@@ -5,6 +5,8 @@ In short that means you are free to use it and to alter it.  You may only distri
 
 This code is provided "as-is" without any warranty or support whatsoever.  While I'll try to help with any problems or questions you have, I can't make any guarantees.  You should also bear in mind that the nature of this code means that if either GotSport or the FA make any changes to their websites it's likely to break.
 
+It is your responsibility to evaluate whether using these programs violates the website providers' Terms and Conditions, which may change from time to time.  I explicitly disclaim any responsibility for how these programs are used (or misused).
+
 INTRODUCTION
 
 These are a set of scripts I've developed for automatically downloading, processing and matching data from the GotSport and England FA Wholegame system.  They are written primarily for teams playing in EBFA (East Berks Football Alliance) but the basic webscraping should work for any League and the changes needed to adapt the SQL and reporting should be easy.
@@ -14,18 +16,18 @@ THE DESIGN (such as it is)
 1.  Download several exports from GotSport: All teams, all Coaches, all Managers, all Players and all Saved Searches of players (the EBFA have set up several filters for e.g. players without a photo uploaded) - gs_dl.rb
 2.  Download manager and player details from Wholegame - fa_manager_dl.rb, fa_player_dl.rb and fa_fetch_dl.rb.  fa_fetch_dl needs to be run after fa_manager_dl and again after fa_player_dl - so the sequence is manager/fetch/player/fetch.
 3.  Rename the downloaded FA files to wg_quals.xlsx (managers) and wg_reg.xlsx (players)
-4.  Import those two spreadsheets into the database - excel_to_sqlite.rb
-5.  Scrape each player on GotSport to get their FAN and a few other details.  This is run in two stages: gs_get_fan_1_worklist.rb will create a database table with the URL of each player page.  gs_get_fan_2_process.rb will visit each URL, scrape the details and update the table but _only_ for players who haven't yet been scraped. It should therefore be possible to restart/rerun this program in the event that it aborts (the need to load each player page makes it quite slow - about 4 players per minute, so having to rerun from scratch would be annoying).
-6.  Load the exported CSV files from step 1 into the database - load_raw.sql
-7.  Transform the raw data as loaded into something more presentable and join the data from the various systems together - staging.sql
-8.  Create reports - TBC
+4.  Import those two spreadsheets into the database - excel_to_sqlite.rb.  This takes two command options -x /path/to/spreadsheets and -d database_file_name
+5.  Scrape each player on GotSport to get their FAN and a few other details.  This is run in two stages: gs_get_fan_1_worklist.rb will create a database table with the URL of each player page.  gs_get_fan_2_process.rb will visit each URL, scrape the details and update the table but _only_ for players who haven't yet been scraped. It should therefore be possible to restart/rerun this program in the event that it aborts (the need to load each player page makes it quite slow - about 4-5 players per minute, so having to rerun from scratch would be annoying).
+6.  Load the exported CSV files from step 1 into the database - load_raw.sql.  A command like sqlite3 database_file_name < load_raw.sql should work if run from the directory the CSV files are in.
+7.  Transform the raw data as loaded into something more presentable and join the data from the various systems together - staging.sql (same command style as previous step)
+8.  Create reports - sqlite_to_excel.rb.  This takes the same arguments as excel_to_sqlite.rb (step 4)
 
 
 GETTING STARTED
 
 You'll need credentials for the system you want to extract data from.  For Wholegame that means something like the "Club Secretary" role and for GotSport a "Club Admin" one.
 
-You need to be familiar with Linux and ideally Docker.  If you understand the Ruby programming language you've got a fighting chance of doing some of your own debugging.  The browser automation uses Selenium and the data processing is based around SQL so knowledge of either of those will help.
+You need to be familiar with Linux and ideally Docker.  If you understand the Ruby programming language you've got a fighting chance of doing some of your own debugging.  The browser automation uses Selenium and the data processing is based around SQL so knowledge of either of those will help. I do my development in Visual Studio code against a remote Linux Docker container running in a Raspberry Pi 4.  Other development environments should work.
 
 With Docker (recommended)
 
@@ -48,6 +50,10 @@ Check the Dockerfile in the docker directory for the latest, but in brief you'll
 
 To run, firstly start geckodriver with geckodriver --binary=/usr/bin/firefox (and optionally --log=debug.  Obvs if your firefox is installed to a different location use that).  The run one of the programs with ruby /path/to/program.
 
-PROBLEMS
+NOTES AND QUERIES
 
 Failures with the webscraper programs are sometimes caused by transient issues with the sites themselves or general Internet reliability.  It's worth retrying a failed program to see if it works second or third time.  If it consistently fails in the same place it's likely the website itself has changed and the programs will need to be fixed.
+
+Please note that only ONE webscraper process (any of the _dl.rb programs or the _get_fan_ ones) can be run at any one time. 
+
+The .sql steps are designed to be idempotent - you can rerun these as needed without having to clear out the database each time (but they do need to be run in the sequence shown above)

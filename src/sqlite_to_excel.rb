@@ -121,7 +121,9 @@ class SQLiteToExcel
 end
 
 x = SQLiteToExcel.new(xlsdir+"progress.xlsx","Registration Progress",dbfile)
-x.add_narrative (["Summary of GotSport and Wholegame registration"])
+x.add_narrative (["Player on Wholegame but not GotSport? Add them to GS if they should be there, if not send me details and I'll remove from Wholegame",
+  "LPGAF Done means they have completed the registration form.  It does NOT mean they are approved to play",
+  "Issues with Photos, ITC etc will show in player's First Name column"])
 x.run_query("select team,last_name,first_name,on_gotsport, on_wholegame, has_fan, has_lpgaf, has_photo, has_poa, has_verified_poa, wg_consent, " + 
   "case when over_16 = 'Y' and coalesce(wg_player_email,'') = '' then 'N'  when over_16 = 'N' and coalesce(wg_parent_email,'') = '' then 'N' when over_16 is null then 'N' else 'Y' end as email_ok " +
   ", case when over_16 = 'Y' then 'Player' when over_16 = 'N' then 'Parent' else 'TBC' end as which_email, wg_reg_status" +
