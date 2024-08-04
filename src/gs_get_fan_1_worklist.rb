@@ -11,11 +11,16 @@ $stdout.sync = true
 user, pass = Netrc.read["system.gotsport.com"]
 
 dbfile = ""
+plies = nil
 OptionParser.new do |opts|
   opts.banner = "Usage: gs_get_fan_1_worklist.rb [options]"
 
   opts.on("-d", "--db-file DDDD",  "SQLite database file") do |u|
     dbfile = u
+  end
+
+  opts.on("-p=s", "--plies=s", "Number of parallel tables to set up") do |p|
+    plies = p
   end
   
 end.parse!
@@ -61,12 +66,25 @@ end
 
 puts "Starting.. User is #{user}"
 
-db =   db = SQLite3::Database.new(dbfile)
-db.execute("drop table if exists raw_gs_fan_etc;")
-db.execute("create table raw_gs_fan_etc (profile_url, first_name, last_name, birthdate, country_birth, country_citizen, fan, fanlocked, namelocked);")
-
 
 begin
+    
+    
+  db =   db = SQLite3::Database.new(dbfile)
+  db.execute("drop table if exists raw_gs_fan_etc;")
+  db.execute("create table raw_gs_fan_etc (profile_url, first_name, last_name, birthdate, country_birth, country_citizen, fan, fanlocked, namelocked, photolocked, photopresent);")
+
+# if parallel processing is enabled, create a number of copy tables
+
+  if plies
+    puts "setting up #{plies} tables"
+    for t in 1..plies.to_i do
+      db.execute("drop table if exists raw_gs_fan_etc" + t.to_s + ";")
+      db.execute("create table raw_gs_fan_etc" + t.to_s + " as select * from raw_gs_fan_etc;")
+    end
+  else
+    puts "not setting up parallel tables"
+  end
 
     dl = Driver.new('https://system.gotsport.com')
   
@@ -117,9 +135,15 @@ begin
     table = dl.find('#players-table > tbody:nth-child(2)',"Locating player table for page #{page}")
     rows = table.find_elements(tag_name: 'tr')
 
+    ply = 1
     rows.each do |row|
       p = row.find_element(css: 'td:nth-child(2) > div:nth-child(1) > div:nth-child(2) > a:nth-child(1)')
       db.execute("insert into raw_gs_fan_etc (profile_url) values (?);", [p.attribute('href')])
+      if plies
+        db.execute("insert into raw_gs_fan_etc"+ ply.to_s + " (profile_url) values (?);", [p.attribute('href')])
+        ply = ply + 1
+        if (ply > plies.to_i) then ply = 1 end
+      end
     end
 
   end
