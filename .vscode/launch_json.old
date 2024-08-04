@@ -1,0 +1,38 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+      
+      {
+        "type": "ruby-debug",
+        "request": "launch",
+        "name": "Launch File",
+        "program": "${workspaceFolder}/${command:AskForProgramName}",
+        "programArgs": [],
+        "useBundler": false
+      }
+
+
+
+ //           {
+ //                   "type": "rdbg",
+ //                  "name": "Debug current file with rdbg",
+ //                   "request": "launch",
+ //                   "script": "${file}",
+ //                   //"args": ["/home/james/data/Ashridge_Park_TeamQualificationReport_17022023.xlsx","/home/james/data/master.xlsx"],
+ //                  "args": ["--ebfa","5455","--club","5247","--wgxls","/home/james/Downloads/Ashridge.xlsx",
+ //                   "--team","/home/james/data/master.xlsx","-o","/home/james/data/gfwg_test.xlsx","-s","/home/james/data/gfwg_test_summary.xlsx"],
+//                 "askParameters": false
+ //           },
+   //         {
+   //                 "type": "rdbg",
+   //                 "name": "Attach with rdbg",
+   //                 "request": "attach"
+    //        },
+
+
+
+    ]
+}
