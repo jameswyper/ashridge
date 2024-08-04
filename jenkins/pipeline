@@ -1,0 +1,81 @@
+// this is the Jenkins pipeline I'm using to automate all the fetching and reporting - you can plunder this to create a similar script
+// you'll probably need to replace the checkout with a direct copy of the code to the appropriate place (/home/james/code/ashridge) 
+
+pipeline {
+    agent { label 'ainola'}
+
+    stages {
+			
+		stage('Setup') {
+            steps {
+                sh 'docker stop jenkins_reg || echo ****************'
+                sh 'docker rm jenkins_reg || echo **************** '
+                sh 'docker build -t jwyper/ashridge http://192.168.0.96:8090/ashridge.git#release:docker'
+                sh 'docker run -d --name jenkins_reg -v /home/james/.netrc:/home/james/.netrc jwyper/ashridge'
+                sh 'docker exec -u james jenkins_reg bash -c "mkdir -p /home/james/code /home/james/data" '
+                sh 'docker cp /home/james/agent/data/master.xlsx jenkins_reg:/home/james/data/master.xlsx'
+                sh 'docker exec -u james jenkins_reg bash -c "sh /home/james/checkout" '
+
+            }    
+        }
+        stage('Wholegame Extract - Registrations') {
+            steps {
+                sh 'docker exec -u james jenkins_reg bash -c "ruby /home/james/ashridge/src/fa_player_dl.rb" '
+                sleep 120
+                sh 'docker exec -u james jenkins_reg bash -c "ruby /home/james/ashridge/src/fa_fetch_dl.rb" '
+                sh 'docker exec -u james jenkins_reg bash -c "mv /home/james/Downloads/* /home/james/data/wg_reg.xlsx " '
+                //sh 'docker cp jenkins_reg:/home/james/data/wg_reg.xlsx ./wg_reg.xlsx'
+            }
+        }
+        stage('Wholegame Extract - Teams') {
+            steps {
+                sh 'docker exec -u james jenkins_reg bash -c "ruby /home/james/ashridge/src/fa_manager_dl.rb" '
+                sleep 120
+                sh 'docker exec -u james jenkins_reg bash -c "ruby /home/james/ashridge/src/fa_fetch_dl.rb" '
+                sh 'docker exec -u james jenkins_reg bash -c "mv /home/james/Downloads/* /home/james/data/wg_quals.xlsx " '
+                //sh 'docker cp jenkins_reg:/home/james/data/wg_quals.xlsx ./wg_quals.xlsx'
+            }
+        }
+        stage('GotSport Extract - exports') {
+            steps {
+                sh 'docker exec -u james jenkins_reg bash -c "ruby /home/james/ashridge/src/gs_dl.rb" '
+                sh 'docker exec -u james jenkins_reg bash -c "mv /home/james/Downloads/* /home/james/data/ " '
+                //sh 'docker cp jenkins_reg:/home/james/data/wg_quals.xlsx ./wg_quals.xlsx'
+            }
+        }
+        stage('GotSport Extract - FAN details - get worklist') {
+            steps {
+                sh 'docker exec -u james jenkins_reg bash -c "ruby /home/james/ashridge/src/gs_get_fan_1_worklist.rb -d /home/james/data/report.db" '
+                //sh 'docker cp jenkins_reg:/home/james/data/wg_quals.xlsx ./wg_quals.xlsx'
+            }
+        }
+        stage('GotSport Extract - FAN details - process the worklist') {
+            steps {
+                sh 'docker exec -u james jenkins_reg bash -c "ruby /home/james/ashridge/src/gs_get_fan_2_process.rb -d /home/james/data/report.db" '
+                //sh 'docker cp jenkins_reg:/home/james/data/wg_quals.xlsx ./wg_quals.xlsx'
+            }
+        }
+        stage('Load tables and report') {
+            steps {
+                sh 'docker exec  -u james jenkins_reg bash -c "ruby /home/james/ashridge/src/excel_to_sqlite.rb -x /home/james/data/ -d /home/james/data/report.db"'
+                sh 'docker exec  -u james jenkins_reg bash -c "cd /home/james/data && sqlite3 /home/james/data/report.db < /home/james/ashridge/src/load_raw.sql"'
+                sh 'docker exec  -u james jenkins_reg bash -c "cd /home/james/data && sqlite3 /home/james/data/report.db < /home/james/ashridge/src/staging.sql"'
+                sh 'docker exec  -u james jenkins_reg bash -c "mkdir -p /home/james/data/output"'
+                sh 'docker exec  -u james jenkins_reg bash -c "ruby /home/james/ashridge/src/sqlite_to_excel.rb -x /home/james/data/output -d /home/james/data/report.db"'
+                
+                sh 'docker cp jenkins_reg:/home/james/data/output .'
+                sh 'docker cp jenkins_reg:/home/james/data/report.db .'
+                archiveArtifacts artifacts: 'output/*.xlsx'
+                
+            }
+            
+        }
+    }
+    post {
+        always {
+            emailext( attachLog: true, body: "Report attached", attachmentsPattern: '*.xlsx', subject:"Ashridge Registration Report", to: '<email address redacted>')
+        }      
+        
+    }
+}
+
