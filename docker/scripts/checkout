@@ -1,0 +1,1 @@
+ git clone -b release --single-branch --depth 1 http://192.168.0.96:8090/ashridge.git
