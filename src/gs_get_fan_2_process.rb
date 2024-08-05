@@ -166,7 +166,7 @@ begin
 
       db.execute("update #{table} set first_name = ?, last_name = ?, birthdate = ?, country_birth = ?," +
             "country_citizen = ?, fan = ?, fanlocked = ?, namelocked = ?, photolocked = ? , photopresent = ? where profile_url = ?",
-             firstname,lastname,birthdate,itc_birth,itc_citz,fan,fanlocked,readonly,thisurl,photolocked,photopresent)
+             firstname,lastname,birthdate,itc_birth,itc_citz,fan,fanlocked,readonly,photolocked,photopresent,thisurl)
   end 
 
 ensure
