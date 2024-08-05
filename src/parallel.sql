@@ -8,10 +8,10 @@ ATTACH DATABASE './parallel/report4.db' AS r4;
 -- ATTACH DATABASE ./parallel/report8.db AS r8;
 
 delete from raw_gs_fan_etc;
-insert into raw_gs_fan_etc select * from r1.raw_gs_fan_etc where first_name is not null;
-insert into raw_gs_fan_etc select * from r2.raw_gs_fan_etc where first_name is not null;
-insert into raw_gs_fan_etc select * from r3.raw_gs_fan_etc where first_name is not null;
-insert into raw_gs_fan_etc select * from r4.raw_gs_fan_etc where first_name is not null;
+insert into raw_gs_fan_etc select * from r1.raw_gs_fan_etc1 where first_name is not null;
+insert into raw_gs_fan_etc select * from r2.raw_gs_fan_etc2 where first_name is not null;
+insert into raw_gs_fan_etc select * from r3.raw_gs_fan_etc3 where first_name is not null;
+insert into raw_gs_fan_etc select * from r4.raw_gs_fan_etc4 where first_name is not null;
 -- insert into raw_gs_fan_etc select * from r5.raw_gs_fan_etc;
 -- insert into raw_gs_fan_etc select * from r6.raw_gs_fan_etc;
 -- insert into raw_gs_fan_etc select * from r7.raw_gs_fan_etc;
