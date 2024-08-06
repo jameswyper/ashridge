@@ -7,6 +7,7 @@ require 'optparse'
 WHITE = "ffffff"
 GREEN = "32ff00"
 RED = "ff0000"
+AMBER = "ffbf00"
 
 xlsdir = "."
 dbfile = ""
@@ -132,15 +133,26 @@ x.run_query("select team,last_name,first_name,on_gotsport, on_wholegame, parent_
   {"team" => "Team", "last_name" => "Last Name", "first_name" => "First Name","on_gotsport" => "On GotSport?",
     "on_wholegame" => "On Wholegame?", "has_fan" => "FAN on GotSport?", "has_lpgaf" => "LPGAF done?", "has_photo" => "Photo on GotSport?",
    "wg_consent" => "FA Consent?", "wg_reg_status" => "FA Registration Status",
-     "which_email" => "Whose email needed?", "parent_attached" => "Parent on GotSport?", "wg_fan" => "FAN on Wholegame",
-    "needs_poa" => "POA needs to be uploaded?", "photo_locked" => "Photo Approved?"})
+     "which_email" => "Whose email needed on Wholegame?", "parent_attached" => "Parent on GotSport?", "wg_fan" => "FAN on Wholegame",
+    "needs_poa" => "POA/BP needs to be uploaded?", "photo_locked" => "Photo Approved?"})
 x.set_widths([26,17,17,11,13,14,14,14,11,15,12,11,10,18,18,19])
 x.namemap.each_value {|v| x.ynrg(v) if v.include? "?"}
 x.format_column("FA Consent?") {|v| if ['Offline','Online'].include? v then GREEN else RED end}
 x.format_column("photo_locked") {|v| if v == 'Y' then GREEN else RED end}
 x.format_column("which_email") {|v| if v.include? 'P' then RED else WHITE end}
 x.format_column("needs_poa") {|v| if v == 'Y' then RED else GREEN end}
-
+x.format_column("wg_reg_status") do |v| 
+  if v == "Registered"
+    GREEN
+  else 
+    if v == "Pending League"
+      AMBER
+    else
+      RED
+    end
+  end
+end
+  
 x.mask_column("last_name") {|v| v[0] + ("-" * v[1..-2].size) + v[-1]}
 x.mask_column("first_name") do |v|
   w = v.split(" ")
@@ -160,4 +172,10 @@ x = SQLiteToExcel.new(xlsdir+"consentwg.xlsx","Consent on Wholegame",dbfile)
 x.add_narrative(["Players with LPGAF ready for Consent"])
 x.run_query("select last_name, first_name from player_match where on_wholegame = 'Y' and has_lpgaf = 'Y' and wg_consent = '-';",
   {"first_name" => "First Name", "last_name" => "Last Name"})
+x.save
+
+x = SQLiteToExcel.new(xlsdir+"playeremail.xlsx","Player Email Required",dbfile)
+x.add_narrative(["Players needing their own email address on Wholegame"])
+x.run_query("select first_name, last_name, wg_birthdate, parent_one_email, parent_two_email from player_match where " + 
+ "on_wholegame = 'Y' and which_email = 'Player' and agesort is not null and team_gender = 'c' ",{"first_name" => "First Name", "last_name" => "Last Name"})
 x.save

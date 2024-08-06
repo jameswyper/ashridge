@@ -110,7 +110,10 @@ w.player_email as wg_player_email,w.parent_email as wg_parent_email,w.consent as
 w.gender as wg_gender, g.gender as gs_gender
 from wg_players_all w full outer join gs_players_all g
 on trim(lower(replace(w.last_name,"'",''))) = trim(lower(replace(g.last_name,"'",'')))
-and trim(lower(substr(w.first_name,1,instr(w.first_name,' ')-1))) = trim(lower(substr(g.first_name,1,instr(g.first_name,' ')-1)))
+and 
+case when instr(w.first_name,' ') = 0 then trim(lower(w.first_name)) else trim(lower(substr(w.first_name,1,instr(w.first_name,' ')-1))) end
+= 
+case when instr(g.first_name,' ') = 0 then trim(lower(g.first_name)) else trim(lower(substr(g.first_name,1,instr(g.first_name,' ')-1))) end
 
 -- the two lines above match on last name and first name.  For last name any apostrophes are removed prior to comparison.  #
 -- For first name only the first word is compared. In both cases the strings are trimmed and downcased #
@@ -129,6 +132,7 @@ a.fan as wg_fan,
 gf.fan as gs_fan, 
 coalesce(gs_team,wg_team) as team,
 g.parent_one_email,
+g.parent_two_email,
 case when g.parent_one_email = '' then 'N' else 'Y' end as parent_attached,
 gs_team,
 wg_team,
@@ -141,7 +145,7 @@ photo_locked,
 case when name_locked = 'N' and has_poa = 'N' then 'Y' else 'N' end as needs_poa,
 wg_sub_date, wg_reg_date, wg_reg_status, wg_consent,
 wg_player_email, wg_parent_email,  over_16, over_14,
-case when over_16 = 'Y' and wg_player_email = '' then "Player" when over_16 = 'N' and wg_parent_email = '' then 'Parent' else '' end as which_email,
+case when over_16 = 'Y' and (wg_player_email = '' or wg_player_email is null) then "Player" when over_16 = 'N' and (wg_parent_email = '' or wg_parent_email is null). then 'Parent' else '' end as which_email,
 g.postal_code as postcode, g.address as address, gs_birthdate, wg_birthdate,
 case when a.fan is not null and a.fan = gf.fan then 'Y' when a.fan is null or a.id is null then ' ' else 'N' end as fans_match,
 case when a.fan is not null and gs_birthdate = wg_birthdate then 'Y' when a.fan is null or a.id is null then ' ' else 'N' end as birthdates_match
