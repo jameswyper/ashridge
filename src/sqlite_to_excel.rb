@@ -137,6 +137,17 @@ x.run_query("select team,last_name,first_name,on_gotsport, on_wholegame, parent_
     "needs_poa" => "POA/BP needs to be uploaded?", "photo_locked" => "Photo Approved?"})
 x.set_widths([26,17,17,11,13,14,14,14,11,15,12,11,10,18,18,19])
 x.namemap.each_value {|v| x.ynrg(v) if v.include? "?"}
+x.format_column("has_fan") do |v|
+  if v == 'Y'
+    GREEN
+  else
+    if v == 'N'
+      RED
+    else
+      WHITE
+    end
+  end
+end
 x.format_column("FA Consent?") {|v| if ['Offline','Online'].include? v then GREEN else RED end}
 x.format_column("photo_locked") {|v| if v == 'Y' then GREEN else RED end}
 x.format_column("which_email") {|v| if v.include? 'P' then RED else WHITE end}
