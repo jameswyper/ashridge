@@ -144,8 +144,11 @@ begin
         end
         j = j + 1
       end
-      if (f < 1) then raise "Should have found a Player Team filter?" end
-      dl.click('div.search-filter:nth-child('+f.to_s+') > div:nth-child(1) > div:nth-child(4) > a:nth-child(1)',"Found Player Team filter; removing it")
+      if (f < 1) 
+        puts "WARNING For search #{s} should have found a Player Team filter?"
+      else
+        dl.click('div.search-filter:nth-child('+f.to_s+') > div:nth-child(1) > div:nth-child(4) > a:nth-child(1)',"For search #{s}: " + "Found Player Team filter; removing it")
+      end
         
  
     end
