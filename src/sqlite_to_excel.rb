@@ -137,7 +137,7 @@ x.run_query("select team,last_name,first_name,on_gotsport, on_wholegame, parent_
     "needs_poa" => "POA/BP needs to be uploaded?", "photo_locked" => "Photo Approved?"})
 x.set_widths([26,17,17,11,13,14,14,14,11,15,12,11,10,18,18,19])
 x.namemap.each_value {|v| x.ynrg(v) if v.include? "?"}
-x.format_column("has_fan") do |v|
+x.format_column("fan_match") do |v|
   if v == 'Y'
     GREEN
   else
