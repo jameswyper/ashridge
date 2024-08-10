@@ -148,13 +148,13 @@ begin
         puts "WARNING For search #{s} should have found a Player Team filter?"
       else
         dl.click('div.search-filter:nth-child('+f.to_s+') > div:nth-child(1) > div:nth-child(4) > a:nth-child(1)',"For search #{s}: " + "Found Player Team filter; removing it")
+
+        dl.click('input.btn-xs',"Clicking on second Search button to run the search")
+        sleep 10 
       end
-        
- 
     end
 
-    dl.click('input.btn-xs',"Clicking on second Search button to run the search")
-    sleep 10
+
     puts dl.find('li.fz-sm',"Getting result count..").text
     # our filters are set and the search run and we can download. Save the name of the filter in an array for later first
     playerexports << s
