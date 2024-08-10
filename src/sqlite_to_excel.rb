@@ -126,12 +126,12 @@ x.add_narrative (["Player on Wholegame but not GotSport? Add them to GotSport if
   "LPGAF Done means they have completed the registration form.  It does NOT mean they are approved to play",
   "Issues with Photos, ITC etc will show in player's First Name column",
   "If FAN on GotSport is blank AND there is a FAN in the next column please add it to GotSport"])
-x.run_query("select team,last_name,first_name,on_gotsport, on_wholegame, parent_attached, has_fan, wg_fan, has_lpgaf, has_photo," + 
+x.run_query("select team,last_name,first_name,on_gotsport, on_wholegame, parent_attached, case gs_fan = wg_fan then 'Y' else 'N' end as fan_match, wg_fan, has_lpgaf, has_photo," + 
   "photo_locked, needs_poa, wg_consent, " + 
   "which_email, wg_reg_status" +
   " from player_match where agesort is not null and team_gender = 'c' order by agesort, team, last_name, first_name",
   {"team" => "Team", "last_name" => "Last Name", "first_name" => "First Name","on_gotsport" => "On GotSport?",
-    "on_wholegame" => "On Wholegame?", "has_fan" => "FAN on GotSport?", "has_lpgaf" => "LPGAF done?", "has_photo" => "Photo on GotSport?",
+    "on_wholegame" => "On Wholegame?", "fan_match" => "FAN on GS matches?", "has_lpgaf" => "LPGAF done?", "has_photo" => "Photo on GotSport?",
    "wg_consent" => "FA Consent?", "wg_reg_status" => "FA Registration Status",
      "which_email" => "Whose email needed on Wholegame?", "parent_attached" => "Parent on GotSport?", "wg_fan" => "FAN on Wholegame",
     "needs_poa" => "POA/BP needs to be uploaded?", "photo_locked" => "Photo Approved?"})

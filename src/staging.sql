@@ -145,7 +145,7 @@ photo_locked,
 case when name_locked = 'N' and has_poa = 'N' then 'Y' else 'N' end as needs_poa,
 wg_sub_date, wg_reg_date, wg_reg_status, wg_consent,
 wg_player_email, wg_parent_email,  over_16, over_14,
-case when over_16 = 'Y' and (wg_player_email = '' or wg_player_email is null) then "Player" when over_16 = 'N' and (wg_parent_email = '' or wg_parent_email is null) then 'Parent' else '' end as which_email,
+case when over_16 = 'Y' and (wg_player_email = '' or wg_player_email is null) then "Player" when over_16 = 'N' and (wg_parent_email = '' or wg_parent_email is null)s then 'Parent' else '' end as which_email,
 g.postal_code as postcode, g.address as address, gs_birthdate, wg_birthdate,
 case when a.fan is not null and a.fan = gf.fan then 'Y' when a.fan is null or a.id is null then ' ' else 'N' end as fans_match,
 case when a.fan is not null and gs_birthdate = wg_birthdate then 'Y' when a.fan is null or a.id is null then ' ' else 'N' end as birthdates_match
