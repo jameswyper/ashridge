@@ -74,3 +74,5 @@ end
 
 ExcelToSQLite.new(xlsdir + "wg_quals.xlsx",dbfile,"raw_wgquals","Team Qualifications Report",10)
 ExcelToSQLite.new(xlsdir + "wg_reg.xlsx",dbfile,"raw_wgreg","Club - Player Report",7)
+ExcelToSQLite.new(xlsdir + "master.xlsx",dbfile,"raw_ap_mgr","flat",1)
+ExcelToSQLite.new(xlsdir + "master.xlsx",dbfile,"raw_ap_team","teams",1)

@@ -11,8 +11,8 @@
             "name": "Debug current file with rdbg",
             "request": "launch",
             "script": "${file}",
-            /*"args" : [ "/home/james/data/wg_quals.xlsx", "/home/james/data/master.xlsx"]*/
-           "args" : [ "-d","/home/james/Downloads/tmpdownloads/report.db","-x","/home/james/Downloads/tmpdownloads"]
+            //"args" : [ "/home/james/data/wg_quals.xlsx", "/home/james/data/master.xlsx"]*/
+           "args" : [ "-d","/home/james/Downloads/teams.db","-x","/home/james/Downloads"]
 //            "args" : [ "-d","/home/james/Downloads/test.db","-p","8"]
   //          "args" : [ "-d","/home/james/Downloads/test.db"]
 /*            "args": ["-o", "/home/james/data/gfwg.xlsx",
