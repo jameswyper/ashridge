@@ -16,7 +16,8 @@ OptionParser.new do |opts|
 end.parse!
 
 db = SQLite3::Database.new(dbfile)
-
+db.execute("drop table if exists raw_fa_dbs;")
+db.execute("create table raw_fa_dbs (name,fan,status,last_award_date);")
 
 class Driver
 
@@ -106,23 +107,32 @@ begin
   p = dl.find_id("BtnAcceptCookies","Locating privacy pop-up",true)
   dl.wait.until {p.displayed?}
   dl.click(:id,"BtnAcceptCookies","Closing Privacy pop-up")
-
-
+  
   dl.click(:partial_link_text,"Club Secretary","Clicking on Club Secretary Tab")
   dl.click(:partial_link_text,"DBS Applications","Clicking on DBS Applications",true)
   sleep 5
-  apps = dl.find_id("crcApplicationsList","Finding applications",true)
-  peeps = apps.find_elements(:css,"li.list-group-item.col-md-12")
-  peeps.each do |p|
-    name = p.find_element(:css,".name").text
-    fan = p.find_element(:css,".fan-id").text
-    status = p.find_elements(:css,".col-md-2")[1].text
-    puts "#{name}/#{fan}/#{status}"
-  end
 
   pages = dl.find_css("li.page-item")
-  puts "should say 1: #{pages[1].text}"
-  puts "should say next: #{pages[-1].text}"
+
+  loop do
+    morepages = pages[-1].find_element(:css,"a.page-link").displayed?
+    apps = dl.find_id("crcApplicationsList","Finding applications",true)
+    peeps = apps.find_elements(:css,"li.list-group-item.col-md-12")
+    peeps.each do |p|
+      name = p.find_element(:css,".name").text
+      fan = p.find_element(:css,".fan-id").text
+      status = p.find_elements(:css,".col-md-2")[1].text
+      date = p.find_element(:css,".btn").text
+      puts "#{name} #{fan[1..-1]}"  
+      db.execute("insert into raw_fa_dbs (name,fan,status,last_award_date) values (?,?,?,?);",name,fan[1..-1],status,date)
+    end
+    if morepages
+      pages[-1].find_element(:css,"a.page-link").click 
+      sleep 3
+      pages = dl.find_css("li.page-item")
+    end
+    break unless morepages
+  end 
 
 
 ensure
