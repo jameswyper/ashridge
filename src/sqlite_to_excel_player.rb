@@ -31,14 +31,14 @@ x.add_narrative (["Player on Wholegame but not GotSport? Add them to GotSport if
   "If FAN on GotSport is blank AND there is a FAN in the next column please add it to GotSport"])
 x.run_query("select team,last_name,first_name,on_gotsport, on_wholegame, parent_attached, case when gs_fan = wg_fan then 'Y' else 'N' end as fan_match, wg_fan, has_lpgaf, has_photo," + 
   "photo_locked, needs_poa, wg_consent, " + 
-  "which_email, wg_reg_status" +
-  " from player_match where agesort is not null and team_gender = 'c' order by agesort, team, last_name, first_name",
+  "which_email, wg_reg_status , case when payment_id is null then 'N' else 'Y' end as payment_status" +
+  " from player_match a left join payments_match b on a.gs_id = b.gs_id where agesort is not null and team_gender = 'c' order by agesort, team, last_name, first_name",
   {"team" => "Team", "last_name" => "Last Name", "first_name" => "First Name","on_gotsport" => "On GotSport?",
     "on_wholegame" => "On Wholegame?", "fan_match" => "FAN on GS matches?", "has_lpgaf" => "LPGAF done?", "has_photo" => "Photo on GotSport?",
    "wg_consent" => "FA Consent?", "wg_reg_status" => "FA Registration Status",
      "which_email" => "Whose email needed on Wholegame?", "parent_attached" => "Parent on GotSport?", "wg_fan" => "FAN on Wholegame",
-    "needs_poa" => "POA/BP needs to be uploaded?", "photo_locked" => "Photo Approved?"})
-x.set_widths([26,17,17,11,13,14,14,14,11,15,12,11,10,18,18,19])
+    "needs_poa" => "POA/BP needs to be uploaded?", "photo_locked" => "Photo Approved?", "payment_status" => "Paid?"})
+x.set_widths([26,17,17,11,13,14,14,14,11,15,12,11,10,18,18,19,10])
 x.namemap.each_value {|v| x.ynrg(v) if v.include? "?"}
 x.format_column("fan_match") do |v|
   if v == 'Y'
@@ -75,6 +75,16 @@ x.mask_column("first_name") do |v|
   w.join(" ")
 end
 x.save
+
+x = SQLiteToExcel.new(xlsdir+"unmatched.xlsx","Unmatched Payments",dbfile)
+x.add_narrative (["This page shows players for who we've received payment but can't match the payment to the player",
+"We try to match on Team + email + name, Team + email, Team + Name",
+"Any unmatched players are likely not on GotSport at all, or using a different email address to ANY we have in GotSport or Wholegame for the player/parent"])
+x.run_query("select team_name, player_name, cardholder_name from payments_match where gs_id is null order by team_name, player_name",
+  {"team_name" => "Team", "player_name" => "Player Name", "cardholder_name" => "Cardholder"})
+x.set_widths([26,17,17])
+x.save
+
 
 x = SQLiteToExcel.new(xlsdir+"addtowg.xlsx","Add to Wholegame",dbfile)
 x.add_narrative(["Players on GotSport to be added to Wholegame"])

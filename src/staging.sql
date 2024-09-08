@@ -131,6 +131,7 @@ case when a.fan is null then 'N' else 'Y' end as on_wholegame,
 a.fan as wg_fan,
 gf.fan as gs_fan, 
 coalesce(gs_team,wg_team) as team,
+g.email as contact_email,
 g.parent_one_email,
 g.parent_two_email,
 case when g.parent_one_email = '' then 'N' else 'Y' end as parent_attached,
@@ -148,7 +149,8 @@ wg_player_email, wg_parent_email,  over_16, over_14,
 case when over_16 = 'Y' and (wg_player_email = '' or wg_player_email is null) then "Player" when over_16 = 'N' and (wg_parent_email = '' or wg_parent_email is null) then 'Parent' else '' end as which_email,
 g.postal_code as postcode, g.address as address, gs_birthdate, wg_birthdate,
 case when a.fan is not null and a.fan = gf.fan then 'Y' when a.fan is null or a.id is null then ' ' else 'N' end as fans_match,
-case when a.fan is not null and gs_birthdate = wg_birthdate then 'Y' when a.fan is null or a.id is null then ' ' else 'N' end as birthdates_match
+case when a.fan is not null and gs_birthdate = wg_birthdate then 'Y' when a.fan is null or a.id is null then ' ' else 'N' end as birthdates_match,
+a.id as gs_id
 from
 stg_player_match a left outer join gs_players_all g on a.id = g.id
  left outer join gs_teams_all t on coalesce(gs_team,wg_team) = t.team
