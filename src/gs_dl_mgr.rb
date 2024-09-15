@@ -73,6 +73,7 @@ end
 
 officials = Array.new
 teams = Hash.new
+output = Array.new
 
 CSV.foreach(mgrfile, headers: true) do |row|
    officials << {id: row["Id Number"], role: "managers"}
@@ -100,7 +101,7 @@ capture the FAN
 =end
 
 
-puts "Starting.. User is #{user}"
+puts "Starting.. User is #{user} #{Time.now}"
 begin
 
     dl = Driver.new('https://system.gotsport.com')
@@ -144,12 +145,13 @@ begin
       teamrows.each do |team|
         teamid = team.attribute('id').split('-')[-1]
         t = teams[teamid]
-        if t[:level].start_with? "EBFA"
+        roles = team.find_element(:css,'td:nth-child(4)').text
+        puts "found #{t[:name]} roles #{roles}"
+        if (t[:level].start_with? "EBFA") && ((o[:role] == "managers" && roles.include?("manager")) || (o[:role] == "coaches" && roles.include?("coach")) )
           #needs to be EBFA team AND role matches manager or coach
           ebfateamid = teamid
         end
-        roles = team.find_element(:css,'td:nth-child(4)').text
-        puts "found #{t[:name]} roles #{roles}"
+
       end
     end
     
@@ -163,9 +165,9 @@ begin
     dob = dl.find('div.m-b-sm:nth-child(10) > div:nth-child(2) > p:nth-child(1)','looking for ID').text
     userid = dl.find('.col-md-8 > div:nth-child(1) > div:nth-child(3) > div:nth-child(5) > div:nth-child(2) > div:nth-child(2) > p:nth-child(1)','Looking for user ID').text
       
-    puts "For id #{o[:id]} type #{o[:role]} user ID is #{userid} DOB #{dob} photo URL #{photo}"
+    puts "For id #{o[:id]} type #{o[:role]} user ID is #{userid} DOB #{dob} EBFA team: #{ebfateamid} photo URL #{photo} "
     
-    puts "EBFA team: #{ebfateamid}"
+   
 
     fan = ""
     if ebfateamid != ""
@@ -179,12 +181,19 @@ begin
       country_select = Selenium::WebDriver::Support::Select.new(country).selected_options
 
       if (country_select.length == 1) && (country_select[0].attribute('value') == "GB")
-        puts "UK address"
+        #puts "UK address"
         fan = dl.webdriver.find_element(:id,'user_fan_number').attribute('value')
       end
 
     end
     puts "fan is #{fan}"
+
+    output << [o[:id],o[:role],userid,fan,dob,photo]
+  end
+
+  CSV.open(outfile,"w") do |csv|
+    csv << ["id","role","user_id","fan","DOB","photo"]
+    output.each {|o| csv << o }
   end
 
 ensure
@@ -193,3 +202,4 @@ dl.quit
 
 end
 
+puts "finished at #{Time.now}"
