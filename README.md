@@ -20,7 +20,9 @@ THE DESIGN (such as it is)
 5.  Scrape each player on GotSport to get their FAN and a few other details.  This is run in two stages: gs_get_fan_1_worklist.rb will create a database table with the URL of each player page.  gs_get_fan_2_process.rb will visit each URL, scrape the details and update the table but _only_ for players who haven't yet been scraped. It should therefore be possible to restart/rerun this program in the event that it aborts (the need to load each player page makes it quite slow - about 4-5 players per minute, so having to rerun from scratch would be annoying).
 6.  Load the exported CSV files from step 1 into the database - load_raw.sql.  A command like sqlite3 database_file_name < load_raw.sql should work if run from the directory the CSV files are in.
 7.  Transform the raw data as loaded into something more presentable and join the data from the various systems together - staging.sql (same command style as previous step)
-8.  Create reports - sqlite_to_excel.rb.  This takes the same arguments as excel_to_sqlite.rb (step 4)
+8.  Create reports - sqlite_to_excel_player.rb.  This takes the same arguments as excel_to_sqlite.rb (step 4)
+
+For Player Registration that should be enough.  However there's more.  For Ashridge Park we used Stripe to collect player registration payments.  The load_payments and staging_payments sql files takes the CSV file of payments that Stripe can produce and loads it into a payments_match table - along the way doing its best to match up the information on the Stripe payment to the GotSport list of players.  We also have some parents who are unable to pay or have agreed special payment plans set up which means they aren't using Stripe.  To avoid those players showing up as unpaid the load_spp and staging_spp files will create a table with their GotSport ID.  The payments_match and staging_spp table data will be used in the player registration report if the -p switch is added to the command used to run it.
 
 
 GETTING STARTED
