@@ -126,7 +126,7 @@ begin
 
   orgnum = dl.find('li.nav-item:nth-child(5) > a:nth-child(1)','looking for org number').attribute('href').split('/')[-2]
 
-  puts "Org ID is #{orgid} and the *other* Org ID is #{orgnum} and csv Org Id is #{org}"
+  #puts "Org ID is #{orgid} and the *other* Org ID is #{orgnum} and csv Org Id is #{org}"
 
   officials.each do |o|
     
@@ -138,7 +138,7 @@ begin
     teamdiv = dl.find('.col-md-8 > div:nth-child(1) > div:nth-child(3) > div:nth-child(2) > div:nth-child(6) > div:nth-child(2)','finding teams div')
     ebfateamid = ""
     if teamdiv.find_elements(:css,'*').length == 0
-      puts "Manager has no teams"
+      #puts "Manager has no teams"
     else
       teamtable = dl.find(".table","looking for team table")
       teamrows = teamtable.find_elements(:css,'tbody > tr')
@@ -146,7 +146,7 @@ begin
         teamid = team.attribute('id').split('-')[-1]
         t = teams[teamid]
         roles = team.find_element(:css,'td:nth-child(4)').text
-        puts "found #{t[:name]} roles #{roles}"
+        #puts "found #{t[:name]} roles #{roles}"
         if (t[:level].start_with? "EBFA") && ((o[:role] == "managers" && roles.include?("manager")) || (o[:role] == "coaches" && roles.include?("coach")) )
           #needs to be EBFA team AND role matches manager or coach
           ebfateamid = teamid
@@ -165,7 +165,7 @@ begin
     dob = dl.find('div.m-b-sm:nth-child(10) > div:nth-child(2) > p:nth-child(1)','looking for ID').text
     userid = dl.find('.col-md-8 > div:nth-child(1) > div:nth-child(3) > div:nth-child(5) > div:nth-child(2) > div:nth-child(2) > p:nth-child(1)','Looking for user ID').text
       
-    puts "For id #{o[:id]} type #{o[:role]} user ID is #{userid} DOB #{dob} EBFA team: #{ebfateamid} photo URL #{photo} "
+    #puts "For id #{o[:id]} type #{o[:role]} user ID is #{userid} DOB #{dob} EBFA team: #{ebfateamid} photo URL #{photo} "
     
    
 
@@ -175,7 +175,7 @@ begin
       urltail = o[:role] == "managers" ? "TeamManager" : "TeamCoach"
       navurl = "https://system.gotsport.com/users/#{userid}?current_org_id=#{org}&org_id=#{org}&resource_id=#{ebfateamid}&resource_type=Team&type=#{urltail}"
       dl.webdriver.navigate.to(navurl)
-      puts navurl
+      #puts navurl
 
       country = dl.webdriver.find_element(:id,'user_address_attributes_country')
       country_select = Selenium::WebDriver::Support::Select.new(country).selected_options
@@ -186,7 +186,7 @@ begin
       end
 
     end
-    puts "fan is #{fan}"
+    #puts "fan is #{fan}"
 
     output << [o[:id],o[:role],userid,fan,dob,photo]
   end
