@@ -37,9 +37,9 @@ x.add_narrative (["Player on Wholegame but not GotSport? Add them to GotSport if
 x.run_query("select team,last_name,first_name,on_gotsport, on_wholegame, parent_attached, case when gs_fan = wg_fan then 'Y' else 'N' end as fan_match, wg_fan, has_lpgaf, has_photo," + 
   "photo_locked, needs_poa, wg_consent, " + 
   "which_email, wg_reg_status " +
-  ", case when payment_id is null and (approved is null or approved = 'N') then 'N' else 'Y' end as payment_status" +
-  " from player_match" + 
-   "a left join payments_match b on a.gs_id = b.gs_id left join staging_spp c on a.gs_id = c.gs_id" + 
+  ", case when payment_id is null and (approved is null or approved = 'N') then 'N' else 'Y' end as payment_status " +
+  " from player_match " + 
+   "a left join payments_match b on a.gs_id = b.gs_id left join staging_spp c on a.gs_id = c.gs_id " + 
   "where agesort is not null and team_gender = 'c' order by agesort, team, last_name, first_name",
   {"team" => "Team", "last_name" => "Last Name", "first_name" => "First Name","on_gotsport" => "On GotSport?",
     "on_wholegame" => "On Wholegame?", "fan_match" => "FAN on GS matches?", "has_lpgaf" => "LPGAF done?", "has_photo" => "Photo on GotSport?",
