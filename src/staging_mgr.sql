@@ -7,10 +7,15 @@ drop table if exists stg_mgr_xl;
 drop table if exists stg_team_xl;
 drop table if exists stg_mgr_fan_photo;
 
-create table stg_team_xl (team_name, team_age, training_time, training_day, training_venue);
+create table stg_team_xl (team_name, team_age, training_time, training_day, training_venue, ebfa, open_age);
 insert into stg_team_xl (team_name, team_age, training_time, training_day, training_venue) 
   select replace("Team Name","'",''),cast("Team Age" as int), replace("Training Time","'",''),
   replace("Training Day","'",''),replace("Training Venue","'",'') from raw_ap_team where "Team Name" is not null;
+
+update stg_team_xl set open_age = 'N';
+update stg_team_xl set open_age = 'Y' where team_age is null;
+update stg_team_xl set ebfa = 'Y';
+update stg_team_xl set ebfa = 'N' where open_age = 'Y' or team_name like '%Girls%';
 
 create table stg_mgr_xl (team_name, role, name, email, fan, dob);
 insert into stg_mgr_xl (team_name, role, name, email, fan, dob) 
@@ -71,7 +76,7 @@ create table stg_mgr_all as select
 coalesce (x.name, g.name, w.name, d.name) as name,
 coalesce (x.fan, w.fan, d.fan) as fan,
 x.email as email, g.email as gotsport_email, 
-x.team_name as team, t.team_age as team_age, x.role as role, w.team_name as wg_team,
+x.team_name as team, t.team_age as team_age, t.ebfa as ebfa_team, t.open_age as open_age_team, x.role as role, w.team_name as wg_team,
 is_mgr as is_mgr_on_gs, is_coach as is_coach_on_gs, 
 d.status as dbs_status,
 d.last_award_date as dbs_award_date,
@@ -92,5 +97,10 @@ full join stg_mgr_gs g on lower(g.email) = lower(x.email)
 left join stg_mgr_fan_photo f on g.id = f.id
 left join stg_team_xl t on x.team_name = t.team_name ;
 
-update stg_mgr_all set dbs_exp = null where team_age is null;
+update stg_mgr_all set dbs_exp = null where open_age_team = 'Y';
 update stg_mgr_all set dbs_status = null where dbs_exp > date('now','+3 months');
+update stg_mgr_all set dbs_award_date = null where open_age_team = 'Y';
+update stg_mgr_all set fan_on_gotsport = null, photo_on_gotsport = null , dob_on_gs = null where ebfa_team <> 'Y';
+update stg_mgr_all set sg_exp = null where open_age_team = 'Y';
+update stg_mgr_all set needs_adding_to_gs = null where open_age_team = 'Y';
+update stg_mgr_all set dbs_status = null where (dbs_exp not like 'Exp%' and dbs_exp not like 'In%');
