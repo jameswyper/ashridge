@@ -50,6 +50,11 @@ class Driver
     def quit 
         @d.quit
     end
+    def exists(css,msg=nil)
+      puts msg if msg
+      e = @d.find_elements(:css,css)
+      return e
+    end
 end
 
 
@@ -63,6 +68,9 @@ begin
     sleep 15
 
     puts "Waiting to sign in"
+
+    e = dl.exists('button.fc-button.fc-cta-do-not-consent.fc-secondary-button','Check for cookie consent dialog')
+    e[0].click unless e.nil?
 
     dl.send('#user_email',user)
     dl.send('#user_password',pass)
