@@ -3,6 +3,8 @@ require 'selenium-webdriver'
 require 'netrc'
 require 'date'
 require 'fileutils'
+
+require_relative 'wd_helper'
 $stdout.sync = true
 user, pass = Netrc.read["system.gotsport.com"]
 
@@ -15,47 +17,6 @@ FileUtils.rm_f(dldir + "managers.csv")
 FileUtils.rm_f(dldir + "coaches.csv")
 
 
-class Driver
-    def webdriver
-      @d
-    end
-    def initialize(site)
-        @options = Selenium::WebDriver::Firefox::Options.new
-        @d = Selenium::WebDriver.for :remote, url: 'http://localhost:4444', options: @options
-
-        @wait = Selenium::WebDriver::Wait.new(:timeout => 30)
-        @d.manage.timeouts.implicit_wait = 30
-        @d.manage.delete_all_cookies
-        @d.manage.window.resize_to(1920,1080)
-        @d.get(site)
-    end
-    def click(css,msg=nil)
-      puts msg if msg
-        @wait.until {@d.find_element(:css,css)}
-        thing = @d.find_element(:css,css)
-        @d.action.move_to(thing,0,-5).perform
-        thing.click
-        return thing
-    end
-    def send(css,input)
-        @wait.until {@d.find_element(:css,css)}
-        thing = @d.find_element(:css,css)
-        thing.send_keys input
-    end
-    def find(css,msg=nil)
-        puts msg if msg
-        @wait.until {@d.find_element(:css,css)}
-        return @d.find_element(:css,css)
-    end
-    def quit 
-        @d.quit
-    end
-    def exists(css,msg=nil)
-      puts msg if msg
-      e = @d.find_elements(:css,css)
-      return e
-    end
-end
 
 
 
@@ -64,20 +25,8 @@ begin
 
     dl = Driver.new('https://system.gotsport.com')
   
+    dl.signIn(user,pass)
 
-    sleep 15
-
-    puts "Waiting to sign in"
-
-    e = dl.exists('button.fc-button.fc-cta-do-not-consent.fc-secondary-button','Check for cookie consent dialog')
-    e[0].click unless e.nil?
-
-    dl.send('#user_email',user)
-    dl.send('#user_password',pass)
-    sleep 0.1
-    dl.click('.m-b-sm','Signing in..')
-    
-    sleep 15
 
 # get org ID
 

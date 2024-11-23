@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
-require 'selenium-webdriver'
+
 require 'netrc'
 require 'date'
 require 'fileutils'
-
+require_relative 'wd_helper'
 require 'sqlite3'
 require 'optparse'
 
@@ -24,7 +24,7 @@ OptionParser.new do |opts|
   end
   
 end.parse!
-
+=begin
 class Driver
     def webdriver
       @d
@@ -61,7 +61,7 @@ class Driver
         @d.quit
     end
 end
-
+=end
 
 
 puts "Starting.. User is #{user}"
@@ -89,16 +89,7 @@ begin
     dl = Driver.new('https://system.gotsport.com')
   
 
-    sleep 15
-
-    puts "Waiting to sign in"
-
-    dl.send('#user_email',user)
-    dl.send('#user_password',pass)
-    sleep 0.1
-    dl.click('.m-b-sm','Signing in..')
-    
-    sleep 15
+    dl.signIn(user,pass)
 
 # get org ID
 

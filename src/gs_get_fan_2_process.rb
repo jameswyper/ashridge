@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
-require 'selenium-webdriver'
+
 require 'netrc'
 require 'date'
 require 'fileutils'
 require 'sqlite3'
 require 'optparse'
-
+require_relative 'wd_helper'
 $stdout.sync = true
 
 user, pass = Netrc.read["system.gotsport.com"]
@@ -29,6 +29,7 @@ end.parse!
 
 db = SQLite3::Database.new(dbfile)
 
+=begin
 class Driver
     def webdriver
       @d
@@ -65,7 +66,7 @@ class Driver
         @d.quit
     end
 end
-
+=end
 
 
 puts "Starting.. User is #{user}"
@@ -82,17 +83,7 @@ begin
       
       dl = Driver.new('https://system.gotsport.com')
   
-      sleep 10
-
-      puts  "Waiting to sign in"
-
-      dl.send('#user_email',user)
-      dl.send('#user_password',pass)
-      sleep 0.1
-      dl.click('.m-b-sm','Signing in..')
-    
-      sleep 10
-      puts "Signed in"
+      dl.signIn(user,pass)
 
   
   
