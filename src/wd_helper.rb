@@ -43,6 +43,12 @@ class Driver
     return @d.find_element(:id,id)
   end
 
+  def find_link_text(t,msg=nil)
+    puts msg if msg
+    @wait.until {@d.find_element(link_text: t)}
+    return @d.find_element(link_text: t)
+  end
+
   def quit 
       @d.quit
   end
@@ -58,6 +64,12 @@ class Driver
     return @d.find_elements(:tag,tag)
   end
 
+  def selector(name,msg=nil)
+    puts msg if msg
+    select_element = @d.find_element(name: name)
+    return Selenium::WebDriver::Support::Select.new(select_element)
+  end
+   
   def signIn(user,password)
     sleep 10
 

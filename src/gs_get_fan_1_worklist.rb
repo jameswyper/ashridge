@@ -111,7 +111,7 @@ begin
   puts "Other Org ID is #{org2id}"
   rc = dl.find('li.fz-sm',"Getting result count..").text
   total = rc[/.*of (.*) in total.*/,1].to_i
-  pages = (total / pagesize).floor + 1
+  pages = ((total - 1)/ pagesize).floor + 1
   puts "#{rc} so #{pages} pages of #{pagesize}"
 
   playurl = 'https://system.gotsport.com/org/' + org2id + "/players?utf8=%E2%9C%93&per_page=" + pagesize.to_s + "&page="

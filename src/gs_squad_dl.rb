@@ -38,12 +38,33 @@ begin
     tinfo = tds[1]
     tlink = tinfo.find_elements(tag_name: "a")[0].text
     tid = tinfo.find_elements(tag_name: "p")[0].text
-    puts "Team number = #{tid}"
-    puts "Team text = #{tlink}"
+    #puts "Team number = #{tid}"
+    #puts "Team text = #{tlink}"
     teamnav << [tlink,tid] if tds[3].text.start_with?("EBFA")
   end
 
-teamnav.each {|t| puts t[0]}
+teamnav.each do |t|
+   dl.find_link_text(t[0],"Bringing up modal dialog for #{t[0]}").click
+   sleep 2
+   dl.find_id("Squads-tab-link","Clicking on Squads").click
+   sleep 2
+   s = dl.selector("event_id","Finding Select Box")
+   s.select_by(:value ,"34237") # will need to change in future years
+   dl.find("#rosters > form > div > div.form-group.col-md-2 > input","Clicking Search").click
+
+# extract players here
+
+   dl.find('[href="#event-roster-coaches"]',"Clicking coaches").click
+
+# extract coaches here
+
+   dl.find('[href="#event-roster-managers"]',"Clicking managers").click
+
+# extract coaches here 
+
+   dl.find("#global-modal > div > div > div.modal-header > button","Closing").click
+end
+
 
 ensure
 
