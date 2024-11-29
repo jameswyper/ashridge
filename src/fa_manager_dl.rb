@@ -80,11 +80,13 @@ raise "Unexpected text on Export button: #{export.text}" unless export.text == "
 export.click
 
 puts "Clicking on Download"
-dlxpath = "/html/body/div[3]/div[2]/div/mat-dialog-container/export-team-officials-popup/div/div[2]/div[2]/button[2]"
+# dlxpath = "/html/body/div[3]/div[2]/div/mat-dialog-container/export-team-officials-popup/div/div[2]/div[2]/button[2]"
+dlcss = "button.dialog-btn:nth-child(2)"
 
-wait.until {d.find_element(:xpath,dlxpath)}
-dl = d.find_element(:xpath,dlxpath)
-raise "Unexpected text on Download button: #{dl.text}" unless dl.text == "DOWNLOAD"
+
+wait.until {d.find_element(:css,dlcss)}
+dl = d.find_element(:css,dlcss)
+raise "Unexpected text on Download button: #{dl.text}" unless dl.text.downcase == "download"
 dl.click
 sleep 15
 
