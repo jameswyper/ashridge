@@ -6,6 +6,7 @@ drop table if exists stg_coach_gs;
 drop table if exists stg_mgr_xl;
 drop table if exists stg_team_xl;
 drop table if exists stg_mgr_fan_photo;
+drop table if exists stg_squad;
 
 create table stg_team_xl (team_name, team_age, training_time, training_day, training_venue, ebfa, open_age);
 insert into stg_team_xl (team_name, team_age, training_time, training_day, training_venue) 
@@ -67,6 +68,9 @@ case when photo = "https://system.gotsport.com/users/photos/default.png" then "N
 fan
 from raw_managers_fan_photo;
 
+create table stg_squad (user_id, team_id, team_name, name, role);
+insert into stg_squad (user_id, team_id, team_name, name, role ) select id,teamid,teamname,name, '' from raw_squad_mgr;
+insert into stg_squad (user_id, team_id, team_name, name, role) select id,teamid,teamname,name,role from raw_squad_coach;
 
 
 
@@ -89,14 +93,15 @@ case when d.fan is not null then 'Y' else 'N' end as on_dbs,
 case when g.email is not null then 'Y' else 'N' end as on_gs,
 case when w.fan is null and x.fan is not null then 'Y' else 'N' end as needs_adding_to_wg,
 case when g.email is null and x.email is not null then 'Y' else 'N' end as needs_adding_to_gs,
-f.fan_ok as fan_on_gotsport, f.photo_ok as photo_on_gotsport, f.fan as gs_fan
-
+f.fan_ok as fan_on_gotsport, f.photo_ok as photo_on_gotsport, f.fan as gs_fan,
+case when s.user_id is null then 'N' else 'Y' end as on_squad_sheet
 from
 stg_mgr_xl x full join stg_mgr_dbs d on x.fan = d.fan full join stg_mgr_wg w on (w.fan = x.fan and w.team_name = x.team_name)
 full join stg_mgr_gs g on lower(g.email) = lower(x.email) 
 left join stg_mgr_fan_photo f on g.id = f.id
-left join stg_team_xl t on x.team_name = t.team_name ;
-
+left join stg_team_xl t on x.team_name = t.team_name 
+left join stg_squad s on f.user_id = s.user_id
+;
 update stg_mgr_all set dbs_exp = null where open_age_team = 'Y';
 update stg_mgr_all set dbs_status = null where dbs_exp > date('now','+3 months');
 update stg_mgr_all set dbs_award_date = null where open_age_team = 'Y';

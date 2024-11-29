@@ -14,10 +14,10 @@
             //"args" : [ "/home/james/data/wg_quals.xlsx", "/home/james/data/master.xlsx"]*/
 //          "args" : [ "-m","/home/james/data/managers.csv","-t","/home/james/data/teams_all.csv",
 //                "-c","/home/james/data/coaches.csv","-o","/home/james/data/output.csv"]
-//          "args" : [ "-d","/home/james/data/report.db","-x","/home/james/data"]
+         "args" : [ "-d","/home/james/data/report.db","-x","/home/james/data"]
 //            "args" : [ "-d","/home/james/Downloads/test.db","-p","4"]
 //           "args" : [ "-d","/home/james/Downloads/test.db"]
-        "args" : [ "-d","/home/james/data"]
+//        "args" : [ "-d","/home/james/data"]
 /*            "args": ["-o", "/home/james/data/gfwg.xlsx",
              "-s", "/home/james/data/gfwg_summary.xlsx",
             "-w", "/home/james/data/wg_reg.xlsx",

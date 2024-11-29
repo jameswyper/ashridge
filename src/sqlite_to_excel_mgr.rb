@@ -26,15 +26,16 @@ end.parse!
 
 x = SQLiteToExcel.new(xlsdir+"mgr_quals.xlsx","Manager Qualifications",dbfile)
 x.add_narrative (["foo"])
-x.run_query("select team, name, role, 
+x.run_query("select team, team_age, ebfa_team, name, role, 
       case when email = gotsport_email then 'Y' else 'N' end as email_match,
         dbs_status, dbs_exp, sg_exp, first_aid_exp,  qual_coach, needs_adding_to_gs, needs_adding_to_wg, " +
-        +"fan_on_gotsport, photo_on_gotsport, dob_on_gs" + 
+        +"fan_on_gotsport, photo_on_gotsport, dob_on_gs, on_squad_sheet" + 
   " from stg_mgr_all where team is not null and role != 'Admin' order by team_age, team, name;",
 {"team" => "Team", "name" => "Name","dbs_status" => "DBS Application", "dbs_exp" => "DBS Expires", "sg_exp" => "Safeguarding Expires",
 "first_aid_exp" => "First Aid Expires", "youth_qual_ok" => "Youth Qualifications OK" , "email_match" => "Email on GS matches?",
 "needs_adding_to_gs" => "Add to GS?", "needs_adding_to_wg"=>"Add to WG?","role" => "Role", "fan_on_gotsport" =>"FAN on GS?",
-"photo_on_gotsport" => "Photo on GS?", "dob_on_gs" => "DOB on GS?"})
+"photo_on_gotsport" => "Photo on GS?", "dob_on_gs" => "DOB on GS?", "on_squad_sheet" => "Cloned into Squad?","qual_coach" => "Coaching Qualification",
+"team_age" => "Team Age", "ebfa_team" => "EBFA Team?"})
 x.set_widths([12,15,8,20,20,20,15])
 x.format_column("dbs_status") do |v|
   if v == "Not started" or (v and v.include? "Required")

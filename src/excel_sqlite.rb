@@ -123,6 +123,24 @@ class SQLiteToExcel
 
   end
   
+  def format_columns(cols)
+    cs = []
+        cols.each {|c| cs << find_column(c)}
+    
+    for r in @firstrow..@lastrow do
+      out = []
+      cs.each {|c| out << @s[r][c].value}
+      back = yield(out) 
+      
+      i = 0
+      cs.each do |c| 
+        @s[r][c].change_fill (back[i] || WHITE)
+        i = i + 1
+      end
+      
+    end
+  end
+
   def ynrg(col)
     format_column(col) {|s| if s == "Y" then GREEN else RED end}
   end
