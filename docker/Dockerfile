@@ -1,11 +1,11 @@
-FROM debian:sid
+FROM debian:bookworm-slim
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get -y install vim locales locales-all git ruby ruby-dev build-essential  
 ENV LC_ALL en_GB.UTF-8
 ENV LANG en_GB.UTF-8
 ENV LANGUAGE en_GB.UTF-8
 
-ARG geckodriver_ver=0.33.0
+ARG geckodriver_ver=0.35.0
 #ARG build_rev=0
 
 
