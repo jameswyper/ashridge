@@ -69,7 +69,7 @@ wait.until { d.find_element(:xpath,safexpath) }
 safe = d.find_element(:xpath,safexpath)
 raise "Unexpected text on Safeguarding tab: #{safe.text}" unless safe.text == "Safeguarding & Qualifications"
 safe.click
-
+sleep 5
 puts "Clicking on Export"
 exportxpath = "/html/body/app-root/div[1]/app-portal/div/div[2]/app-core/div/mat-sidenav-container/mat-sidenav-content/official-listing/div/div[2]/safeguarding-listing/div/div[1]/div[1]/div[1]/div/div[2]/button"
 
@@ -77,15 +77,22 @@ exportxpath = "/html/body/app-root/div[1]/app-portal/div/div[2]/app-core/div/mat
 wait.until {d.find_element(:xpath,exportxpath)}
 export = d.find_element(:xpath,exportxpath)
 raise "Unexpected text on Export button: #{export.text}" unless export.text == "Export Team Officials"
+d.action.move_to(export).perform
 export.click
+sleep 1
+
 
 puts "Clicking on Download"
-# dlxpath = "/html/body/div[3]/div[2]/div/mat-dialog-container/export-team-officials-popup/div/div[2]/div[2]/button[2]"
+#dlxpath = "/html/body/div[2]/div[2]/div/mat-dialog-container/export-team-officials-popup/div/div[2]/div[2]/button[2]"
 dlcss = "button.dialog-btn:nth-child(2)"
 
-
+#puts d.find_element(:xpath,"/html/body").attribute(:innerHTML)
 wait.until {d.find_element(:css,dlcss)}
 dl = d.find_element(:css,dlcss)
+
+
+#wait.until {d.find_element(:xpath,dlxpath)}
+#dl = d.find_element(:xpath,dlxpath)
 raise "Unexpected text on Download button: #{dl.text}" unless dl.text.downcase == "download"
 dl.click
 sleep 15
