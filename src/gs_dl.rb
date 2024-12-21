@@ -25,7 +25,7 @@ begin
 
     dl = Driver.new('https://system.gotsport.com')
   
-    dl.signIn(user,pass)
+    dl.gsSignIn(user,pass)
 
 
 # get org ID
@@ -117,9 +117,12 @@ begin
     playerexports << s
     dl.click('a.small-margin-right',"Clicking on Export for Players")
     sleep 5
-    dl.click('.modal-sm > div:nth-child(1) > div:nth-child(1) > button:nth-child(1)',"Dismissing pop-up")
+    dl.findall('.close',"Dismissing pop-up")[-1].click
     sleep 3
   end
+
+
+
 
   # now export coaches and managers (which is thankfully easy)
 

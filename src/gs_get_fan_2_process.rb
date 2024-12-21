@@ -83,7 +83,7 @@ begin
       
       dl = Driver.new('https://system.gotsport.com')
   
-      dl.signIn(user,pass)
+      dl.gsSignIn(user,pass)
 
   
   
