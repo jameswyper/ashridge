@@ -44,6 +44,7 @@ RUN gem install debug
 RUN gem install ruby-debug-ide
 RUN gem install selenium-webdriver
 RUN gem install netrc
+RUN gem install mail
 USER $CUSER
 WORKDIR /home/$CUSER
 COPY scripts/* /home/$CUSER/ 
