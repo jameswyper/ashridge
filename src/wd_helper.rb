@@ -77,13 +77,13 @@ class Driver
 
   def findall(css,msg=nil)
     puts msg if msg
-    e = @d.find_elements(:css,css)
+    e = @d.find_elements(css: css)
     return e
   end
 
-  def findall_tag(id,msg=nil)
+  def findall_tag(tag,msg=nil)
     puts msg if msg
-    return @d.find_elements(:tag,tag)
+    return @d.find_elements(tag_name: tag)
   end
 
   def selector(name,msg=nil)
