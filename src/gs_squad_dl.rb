@@ -32,7 +32,15 @@ begin
   
     dl.gsSignIn(user,pass)
 
+    dash = dl.findall("#org-dashboard-header")
+    
+    if dash.length == 0  # we need 2FA to kick in
+      puts "Waiting for email to arrive"
+      sleep 60
 
+      x = CodeMail.new("gotsport","imap.googlemail.com", 993,"[Gmail]/All Mail","gmail.com")
+      dl.gsEnterCode(x.code)
+    end
 # get org ID
 
   orgid = dl.find('a.active').attribute('href').split("/")[-1]

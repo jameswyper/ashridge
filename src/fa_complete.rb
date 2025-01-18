@@ -33,7 +33,7 @@ begin
 
   puts "Pausing to allow email to arrive"
   sleep 20
-  x = CodeMail.new("imap.googlemail.com", 993,"[Gmail]/All Mail","gmail.com")
+  x = CodeMail.new("fa","imap.googlemail.com", 993,"[Gmail]/All Mail","gmail.com")
 
   dl.faEnterCode(x.code)
 

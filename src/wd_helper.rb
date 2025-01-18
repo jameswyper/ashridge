@@ -140,21 +140,40 @@ class Driver
     click("#continue","Clicking CONTINUE button")
   end
 
+
+  def gsEnterCode(code)
+    send("#user_token",code)
+    sleep(0.2)
+    click("input.btn.btn-primary","Clicking on Save")
+    sleep 1
+  end
+
 end
 
 class CodeMail
 
   attr_reader :code 
 
-  def initialize(server,port,inbox,netrc)
+  def initialize(type,server,port,inbox,netrc)
+    if type.downcase == "fa"
+      subject = "Your FA account email verification code"
+      regex = /Your code is: ([0-9]{6})/
+    else
+      if type.downcase == "gotsport"
+        subject = "Two Factor Authentication Required"
+        regex = /Your code is valid for only a limited period of time.\s*(\w{6})/
+      else
+        raise "Incorrect CodeMail type - must be FA or GotSport"
+      end
+    end
     imap = Net::IMAP.new(server,port, true)
     user, pass = Netrc.read[netrc]
     imap.login(user, pass)
     imap.examine(inbox)
-    codemails = imap.search(["SUBJECT", "Your FA account email verification code"])
+    codemails = imap.search(["SUBJECT", subject])
     imapmail = imap.fetch(codemails[-1],"RFC822")[0]
     mail = Mail.new(imapmail.attr["RFC822"])
-    mat = /Your code is: ([0-9]{6})/.match(mail.parts[1].decoded)
+    mat = regex.match(mail.parts[1].decoded)
     @code = mat[1]
     imap.logout
   end
