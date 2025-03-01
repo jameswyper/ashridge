@@ -158,10 +158,13 @@ class CodeMail
     if type.downcase == "fa"
       subject = "Your FA account email verification code"
       regex = /Your code is: ([0-9]{6})/
+      part = 1
     else
       if type.downcase == "gotsport"
         subject = "Two Factor Authentication Required"
-        regex = /Your code is valid for only a limited period of time.\s*(\w{6})/
+        regex = /==  (\w{6})  ==/
+        #regex = /Your code is valid for only a limited period of time.\s*(\w{6})/
+        part = 0
       else
         raise "Incorrect CodeMail type - must be FA or GotSport"
       end
@@ -173,7 +176,7 @@ class CodeMail
     codemails = imap.search(["SUBJECT", subject])
     imapmail = imap.fetch(codemails[-1],"RFC822")[0]
     mail = Mail.new(imapmail.attr["RFC822"])
-    mat = regex.match(mail.parts[1].decoded)
+    mat = regex.match(mail.parts[part].decoded)
     @code = mat[1]
     imap.logout
   end
