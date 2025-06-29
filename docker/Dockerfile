@@ -1,6 +1,6 @@
 FROM debian:bookworm-slim
 ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get -y install vim locales locales-all git ruby ruby-dev build-essential  
+RUN apt-get update && apt-get -y install vim locales locales-all git ruby ruby-dev build-essential  && apt clean
 ENV LC_ALL en_GB.UTF-8
 ENV LANG en_GB.UTF-8
 ENV LANGUAGE en_GB.UTF-8
@@ -15,7 +15,7 @@ RUN apt-get update \
             ca-certificates curl \
  && update-ca-certificates \ 
  && apt-get install -y --no-install-recommends --no-install-suggests \
-            firefox-esr sqlite3 ruby-sqlite3
+            firefox-esr sqlite3 ruby-sqlite3 && apt clean
  
 RUN curl  -f -L -o /tmp/geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v${geckodriver_ver}/geckodriver-v${geckodriver_ver}-linux-aarch64.tar.gz \
  && tar -xzf /tmp/geckodriver.tar.gz -C /tmp/ \
