@@ -82,7 +82,9 @@ begin
     dl.click("div.table-row:nth-child(#{r+1}) > div:nth-child(4) > div:nth-child(1) > img:nth-child(1)","Downloading row #{r+1}")
   end
   
-  # Get DBS application status
+  
+=begin
+  # Get DBS application status - this no longer works
 
   dl.click(".p-l-r10 > div:nth-child(1) > div:nth-child(2)","Clicking on Wholegame Link")
 
@@ -117,7 +119,7 @@ begin
     end
     break unless morepages
   end 
-
+=end
   
 ensure
   dl.quit
