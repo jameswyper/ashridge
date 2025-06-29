@@ -50,4 +50,4 @@ WORKDIR /home/$CUSER
 COPY scripts/* /home/$CUSER/ 
 RUN touch /home/$CUSER/.netrc
 ENTRYPOINT ["geckodriver"]
-CMD ["--binary=/usr/bin/firefox", "--log=debug"]
+CMD ["--binary=/usr/bin/firefox", "--log=debug", "--profile-root=/home/james"]
