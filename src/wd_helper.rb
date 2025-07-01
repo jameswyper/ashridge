@@ -128,7 +128,14 @@ class Driver
     click('html body div#panel.panel table.panel_layout tbody tr.panel_layout_row td#panel_center div.inner_container div.api_container.normaltext div#api form#localAccountForm.localAccount div.entry div.buttons button#next',"Signing In..")
     sleep 3
 
-    click("#emailVerificationControl_but_send_code","Clicking SEND CODE button")
+    e = findall("#emailVerificationControl_but_send_code","Checking for SEND CODE button")
+    if e.empty?
+      return false
+    else 
+      puts "Clicking SEND CODE button"
+      e[0].click
+      return true
+    end
 
   end
 
