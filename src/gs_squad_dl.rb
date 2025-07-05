@@ -21,7 +21,7 @@ end.parse!
 
 
 
-allplayers = [["teamid","teamname","id","name","jersey","status"]]
+allplayers = [["teamid","teamname","id","name","jersey","DOB","status"]]
 allmgrs = [["teamid","teamname","id","name","tick"]]
 allcoaches = [["teamid","teamname","id","name","role"]]
 
@@ -73,34 +73,62 @@ teamnav.each do |t|
    dl.find_id("Squads-tab-link","Clicking on Squads").click
    sleep 2
    s = dl.selector("event_id","Finding Select Box")
-   s.select_by(:value ,"34237") # will need to change in future years
+
+# will need to change in future years
+# will need to change in future years
+# will need to change in future years
+# will need to change in future years
+
+
+   s.select_by(:value ,"44291") # will need to change in future years
+
+# will need to change in future years
+# will need to change in future years
+# will need to change in future years
+# will need to change in future years
+# will need to change in future years
+
+
+
    dl.find("#rosters > form > div > div.form-group.col-md-2 > input","Clicking Search").click
 
 
    ptt = dl.find_id("roster-player-table","Finding Players table")
    ptrs = ptt.find_elements(tag_name: "tbody")[0].find_elements(tag_name: "tr") 
    ptrs.each do |ptr|
-     prec = [t[1],t[0]]
-     prec << ptr.attribute("id").split("-")[1] #id number
+
      ptds = ptr.find_elements(tag_name: "td")
-     prec << ptds[0].find_element(tag_name: "a").text #name
-     prec << ptds[3].find_elements(css: '[id^="roster-jersey"]')[0].attribute("value") #jersey
-     prec << ptds[7].text.strip
-     allplayers << prec
+     unless ptds[0].text == "Player list is empty"
+        prec = [t[1],t[0]]
+        prec << ptr.attribute("id").split("-")[1] #id number
+        prec << ptds[0].find_element(tag_name: "a").text #name
+
+        jersey_element = ptds[4].find_elements(css: '[id^="roster-jersey"]')
+        if jersey_element.length > 0
+          prec << jersey_element[0].attribute("value") #jersey
+        end
+        prec << ptds[7].text.strip #DOB
+        prec << ptds[8].text.strip # P or not
+        allplayers << prec
+     end
    end
+
+  
 
    dl.find_id("event-roster-managers-tab-link").click
 
    mtt = dl.find_id("roster-manager-table","Finding Managers table")
    mtrs = mtt.find_elements(tag_name: "tbody")[0].find_elements(tag_name: "tr") 
-   mtrs.each do |mtr|
-    mrec = [t[1],t[0]]
-    mrec << mtr.attribute("id").split("-")[1] #id number
-    mtds = mtr.find_elements(tag_name: "td")
-    mrec << mtds[0].find_element(tag_name: "a").text #name
-    mrec << mtds[2].text.strip #fa-check
-    allmgrs << mrec
-   end
+   unless mtrs[0].find_elements(tag_name: "td")[0].text == "No Managers"  
+     mtrs.each do |mtr|
+      mrec = [t[1],t[0]]
+      mrec << mtr.attribute("id").split("-")[1] #id number
+      mtds = mtr.find_elements(tag_name: "td")
+      mrec << mtds[0].find_element(tag_name: "a").text #name
+      mrec << mtds[2].text.strip #fa-check
+      allmgrs << mrec
+     end
+  end
    
    dl.find_id("event-roster-coaches-tab-link").click
 
@@ -112,7 +140,7 @@ teamnav.each do |t|
         crec << ctr.attribute("id").split("-")[1] #id number
         ctds = ctr.find_elements(tag_name: "td")
         crec << ctds[0].find_element(tag_name: "a").text #name
-        crec << Selenium::WebDriver::Support::Select.new(ctds[2].find_element(id: 'roster_title')).selected_options[0].text #role
+        crec << Selenium::WebDriver::Support::Select.new(ctds[3].find_element(id: 'roster_title')).selected_options[0].text #role
         allcoaches << crec
       end
    end

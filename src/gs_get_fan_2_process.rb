@@ -131,19 +131,24 @@ begin
       end
 
       begin
-        d = dl.webdriver.find_element(css: 'a.text-danger:nth-child(5)')
+        d = dl.webdriver.find_element(id: 'user-photo')
       rescue Selenium::WebDriver::Error::NoSuchElementError
         d = nil
       end
 
       if d
-        photopresent = "Y"
+        u = d.find_element(tag_name: "img").attribute("src")
+        if u.end_with?("default.png")
+          photopresent = "N"
+        else
+          photopresent = "Y"
+        end
       else
         photopresent = "N"
       end
 
-      itc_birth = Selenium::WebDriver::Support::Select.new(dl.find('#user_itc_country_of_birth')).selected_options[0].text
-      itc_citz = Selenium::WebDriver::Support::Select.new(dl.find('#user_itc_country_of_citizenship_')).selected_options[0].text
+      #itc_birth = Selenium::WebDriver::Support::Select.new(dl.find('#user_itc_country_of_birth')).selected_options[0].text
+      #itc_citz = Selenium::WebDriver::Support::Select.new(dl.find('#user_itc_country_of_citizenship_')).selected_options[0].text
       birthyear = Selenium::WebDriver::Support::Select.new(dl.find('#user_birthdate_1i')).selected_options[0].text
       birthmonth = Selenium::WebDriver::Support::Select.new(dl.find('#user_birthdate_2i')).selected_options[0].attribute("value")
       birthday = Selenium::WebDriver::Support::Select.new(dl.find('#user_birthdate_3i')).selected_options[0].text
@@ -151,13 +156,13 @@ begin
         
       birthdate = birthyear + "-" + ("0" + birthmonth)[-2..-1] + "-" + ("0" + birthday)[-2..-1]
 
-      puts "#{firstname} #{lastname} - Locked? #{readonly} - " + 
-            "#{birthyear}-#{birthmonth}-#{birthday} #{birthdate} #{itc_birth} #{itc_citz} FAN:#{fan} locked:#{fanlocked} photolocked:#{photolocked} photopresent:#{photopresent}"
+      #puts "#{firstname} #{lastname} - Locked? #{readonly} - " + 
+      #      "#{birthyear}-#{birthmonth}-#{birthday} #{birthdate} #{itc_birth} #{itc_citz} FAN:#{fan} locked:#{fanlocked} photolocked:#{photolocked} photopresent:#{photopresent}"
 
 
       db.execute("update #{table} set first_name = ?, last_name = ?, birthdate = ?, country_birth = ?," +
             "country_citizen = ?, fan = ?, fanlocked = ?, namelocked = ?, photolocked = ? , photopresent = ? where profile_url = ?",
-             firstname,lastname,birthdate,itc_birth,itc_citz,fan,fanlocked,readonly,photolocked,photopresent,thisurl)
+             firstname,lastname,birthdate,nil,nil,fan,fanlocked,readonly,photolocked,photopresent,thisurl)
   end 
 
 ensure

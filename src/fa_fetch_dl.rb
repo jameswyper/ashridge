@@ -59,7 +59,7 @@ begin
     puts "Signing in.."
     sleep 10
 
-    doc = dl.click('div.cursor-pointer:nth-child(2) > span:nth-child(1)')
+    doc = dl.click('nav.primary > a:nth-child(2)')  
     raise "Unexpected text on My Club button: #{doc.text}" unless doc.text == "Documentation"
 
     file = dl.find('div.table-row:nth-child(1) > div:nth-child(1) > div:nth-child(2)')
