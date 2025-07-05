@@ -97,8 +97,9 @@ class Driver
 
     puts "Waiting to sign in"
 
-    e = findall('button.fc-button.fc-cta-do-not-consent.fc-secondary-button','Check for cookie consent dialog')
-    e[0].click unless e.nil?
+    e = findall('#onetrust-reject-all-handler','Check for cookie consent dialog')
+    
+    e[0].click unless e.empty?
 
     user, password = Netrc.read["system.gotsport.com"]
     send('#user_email',user)
