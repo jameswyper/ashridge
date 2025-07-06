@@ -69,7 +69,7 @@ begin
     end
   end
  
-  filelinks.each do |f|
+  filelinks.uniq.each do |f|
     sleep 3
     dl.click(f,"Clicking on #{f} link")
   end
